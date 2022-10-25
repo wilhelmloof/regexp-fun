@@ -1,0 +1,46 @@
+---
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'docs/**/*.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # windows-latest | macos-latest
+    name: Test changed-files
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+
+      # Example 1
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v33
+
+      - name: List all changed files
+        run: |
+          VALE_ARG="'["
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+            VALE_ARG=$VALE_ARG\"$file\"\," "
+          done
+          VALE_ARG=$VALE_ARG\]\'
+          echo "VALE_ARG=$VALE_ARG" >> $GITHUB_ENV
+          echo $VALE_ARG
+
+      - name: Run Vale cli
+        uses: errata-ai/vale-action@reviewdog
+        with:
+          fail_on_error: true
+          # files: ${{ env.VALE_ARG }}
+          files: '["docs/tutorials/tutorial-create-techdocs-site-corrected.md", "docs/tutorials/tutorial-create-techdocs-site.md"  ]'
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
