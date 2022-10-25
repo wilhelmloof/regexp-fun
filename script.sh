@@ -1,3 +1,3 @@
 #! /bin/zsh
 
-cat foo | sed "s|, \]'$|]'|"
+echo "techdocs-site.md\", ]'" | sed "s|, \]'$|]'|"
