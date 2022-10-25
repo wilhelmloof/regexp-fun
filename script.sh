@@ -1,3 +1,3 @@
 #! /bin/zsh
 
-cat foo
+cat foo | sed "s|, \]'$|]'|"
